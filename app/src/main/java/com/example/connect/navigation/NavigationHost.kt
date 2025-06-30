@@ -9,22 +9,22 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.connect.ui.screen.HomeScreen
 import com.example.connect.ui.screen.LoginScreen
+import com.example.connect.ui.screen.SettingsScreen
+import com.example.connect.utils.Screens
 
 @Composable
 fun NavigationHost(navigation_controller: NavHostController){
-    NavHost(navController = navigation_controller, startDestination = "login"){
-        composable("login"){
-            LoginScreen(onLoginSuccess = {
-                navigation_controller.navigate("home") {
-                    popUpTo("login") { inclusive = true }
-                }
-            })
+    NavHost(navController = navigation_controller, startDestination = Screens.Login.route){
+        composable(Screens.Login.route){
+            LoginScreen(navigation_controller)
         }
-        composable("home") {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                BasicText("Welcome Home!")
-            }
+        composable(Screens.Home.route) {
+            HomeScreen(navigation_controller)
+        }
+        composable(Screens.Settings.route) {
+            SettingsScreen()
         }
     }
 }

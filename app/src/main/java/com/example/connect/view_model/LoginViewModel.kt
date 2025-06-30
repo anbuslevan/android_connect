@@ -5,8 +5,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.connect.repository.AuthRepository
 import com.example.connect.utils.APIUtils
+import com.example.connect.utils.Screens
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,14 +23,14 @@ class LoginViewModel @Inject constructor(
     var loading by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
 
-    fun login(onSuccess: () -> Unit){
+    fun login(navController: NavController){
         viewModelScope.launch {
             loading = true
             try {
                 val response = authRepository.login(email, password)
                 if(response.isSuccessful && response.body()?.message != null){
                     error = null
-                    onSuccess()
+                    navController.navigate(Screens.Home.route)
                 }
                 else {
                     error = APIUtils.parse(response.errorBody()?.string())?.error?.get(0) ?: "Something went wrong"

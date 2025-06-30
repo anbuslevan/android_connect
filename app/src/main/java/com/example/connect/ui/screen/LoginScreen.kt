@@ -17,10 +17,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.connect.view_model.LoginViewModel
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onLoginSuccess: () -> Unit) {
+fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltViewModel()) {
 
     LaunchedEffect(viewModel.error) {
         Log.d("LoginScreen", "Error: $viewModel.error")
@@ -63,7 +64,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onLoginSuccess: () 
                 .border(1.dp, Color.Gray)
                 .padding(top = 16.dp)
                 .clickable(enabled = (!viewModel.loading)) {
-                    viewModel.login(onLoginSuccess)
+                    viewModel.login(navController)
                 },
             contentAlignment = Alignment.Center
         ){
