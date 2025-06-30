@@ -1,5 +1,6 @@
 package com.example.connect.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,11 @@ import com.example.connect.view_model.LoginViewModel
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onLoginSuccess: () -> Unit) {
+
+    LaunchedEffect(viewModel.error) {
+        Log.d("LoginScreen", "Error: $viewModel.error")
+    }
+
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp),
@@ -37,14 +43,6 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onLoginSuccess: () 
             value = viewModel.email,
             onValueChange = { viewModel.email = it },
             placeholder = "Email"
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Input(
-            value = viewModel.username,
-            onValueChange = { viewModel.username = it },
-            placeholder = "Username"
         )
 
         Spacer(modifier = Modifier.height(16.dp))

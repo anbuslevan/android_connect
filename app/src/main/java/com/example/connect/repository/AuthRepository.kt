@@ -5,5 +5,5 @@ import com.example.connect.network.APIService
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(private val apiService: APIService){
-    suspend fun login(username: String, email: String, password: String) = apiService.login(LoginRequest( username, email, password))
+    suspend fun login(email: String, password: String) = apiService.login(LoginRequest(email, password))
 }
