@@ -4,8 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.connect.presentation.ui.auth.AuthScreen
-import com.example.connect.presentation.ui.chat.ChatScreen
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
@@ -14,10 +13,10 @@ fun AppNavGraph(navController: NavHostController) {
         startDestination = Screens.Auth.route
     ){
         composable(Screens.Auth.route) {
-            AuthScreen()
+            AuthNavGraph(rememberNavController())
         }
-        composable(Screens.Chat.route) {
-            ChatScreen()
+        composable(Screens.Connect.route) {
+            ConnectNavGraph(rememberNavController())
         }
     }
 }

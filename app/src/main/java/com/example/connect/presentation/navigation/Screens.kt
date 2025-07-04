@@ -1,6 +1,18 @@
 package com.example.connect.presentation.navigation
 
-sealed class Screens(val route: String) {
-    data object Auth: Screens("auth")
-    data object Chat: Screens("chat")
+interface Route {
+    val route: String
+}
+
+sealed class Screens(override val route: String): Route {
+    data object Auth: Screens("auth") {
+        object Register: Route {
+            override val route: String = "${Auth.route}/register"
+        }
+    }
+    data object Connect: Screens("connect") {
+        object Home: Route {
+            override val route: String = "${Connect.route}/home"
+        }
+    }
 }

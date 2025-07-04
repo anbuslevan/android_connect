@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connect.data.crypto.ServerPublicKeyStore
 import com.example.connect.network.adapter.NetworkResponse
 import com.example.connect.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val repository: AuthRepository,
+    private val serverPublicKeyStore: ServerPublicKeyStore
 ): ViewModel() {
     var state by mutableStateOf(AuthState())
         private set
@@ -53,5 +55,27 @@ class AuthViewModel @Inject constructor(
 
     fun onVerifyOTP(){
 
+    }
+
+    fun getServerPublicKey(retry: Boolean = false){
+        viewModelScope.launch {
+            if(!serverPublicKeyStore.hasKey()){
+                try{
+                    val response = repository.getPublicKey()
+
+                    if(response is NetworkResponse.Success && !response.body.isNullOrBlank()){
+                        serverPublicKeyStore.storePublicKey(response.body)
+                    } else if(response is NetworkResponse.Error){
+                        if(!retry) {
+                            getServerPublicKey(true)
+                        }
+                    }
+                } catch (exception: Exception){
+                    if(!retry) {
+                        getServerPublicKey(true)
+                    }
+                }
+            }
+        }
     }
 }
