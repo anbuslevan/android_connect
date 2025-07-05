@@ -1,9 +1,9 @@
 package com.example.connect.model.response
 
-data class LoginResponse (
+data class AuthResponse (
     val message: String
 ) {
     override fun toString(): String {
-        return "LoginResponse(message='$message')"
+        return "AuthResponse(message='$message')"
     }
 }
