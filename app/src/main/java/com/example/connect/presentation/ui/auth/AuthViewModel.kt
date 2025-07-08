@@ -6,22 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.connect.data.crypto.HashManager
-import com.example.connect.data.crypto.ServerPublicKeyStore
-import com.example.connect.model.request.AuthRequest
-import com.example.connect.model.request.MobileAuthRequest
-import com.example.connect.model.request.TwoFARequest
+import com.example.connect.domain.usecase.AuthUseCase
 import com.example.connect.network.adapter.NetworkResponse
-import com.example.connect.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val hashManager: HashManager,
-    private val repository: AuthRepository,
-    private val serverPublicKeyStore: ServerPublicKeyStore
+    private val authUseCase: AuthUseCase
 ): ViewModel() {
     var state by mutableStateOf(AuthState())
         private set
@@ -43,8 +36,7 @@ class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val payload = serverPublicKeyStore.encryptPayload(MobileAuthRequest(mobileNumber = state.mobileNumber))
-                val response = repository.requestOTP(AuthRequest(encryptedContext = payload ?: ""))
+                val response = authUseCase.requestOTP(state.mobileNumber)
 
                 if(response is NetworkResponse.Success){
                     state = state.copy(
@@ -70,10 +62,7 @@ class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val payload = serverPublicKeyStore.encryptPayload(
-                    TwoFARequest(mobileNumber = state.mobileNumber, otp = hashManager.hashPayload(state.otp))
-                )
-                val response = repository.verifyOTP(AuthRequest(encryptedContext = payload ?: ""))
+                val response = authUseCase.verifyOTP(state.mobileNumber, state.otp)
 
                 if(response is NetworkResponse.Success){
                     state = state.copy(
@@ -94,11 +83,11 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun getServerPublicKey(){
-        viewModelScope.launch {
-            if(!serverPublicKeyStore.hasKey()){
-                serverPublicKeyStore.fetchAndStorePublicKeyServer()
-            }
-        }
+    suspend fun getServerPublicKey(){
+        authUseCase.fetchServersPublicKey()
+    }
+
+    fun generateDeviceId(){
+        authUseCase.generateDeviceId()
     }
 }

@@ -1,4 +1,4 @@
-package com.example.connect.model.request
+package com.example.connect.domain.model.request
 
 data class LoginRequest (
     val email: String,

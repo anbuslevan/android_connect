@@ -4,19 +4,19 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
 import android.util.Log
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 import androidx.core.content.edit
 import com.example.connect.network.adapter.NetworkResponse
-import com.example.connect.repository.AuthRepository
+import com.example.connect.domain.repository.AuthRepository
+import com.google.gson.Gson
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.security.KeyFactory
 import java.security.PublicKey
 import java.security.spec.X509EncodedKeySpec
-import com.google.gson.Gson
-import javax.crypto.Cipher
+import javax.inject.Inject
 
 class ServerPublicKeyStore @Inject constructor(
     private val gson: Gson,
+    private val cryptoManager: CryptoManager,
     private val repository: AuthRepository,
     @ApplicationContext private val context: Context
 ) {
@@ -49,8 +49,8 @@ class ServerPublicKeyStore @Inject constructor(
              try{
                 val response = repository.getPublicKey()
 
-                if(response is NetworkResponse.Success && !response.body.isNullOrBlank()){
-                    val publicKey = response.body
+                if(response is NetworkResponse.Success && response.body != null){
+                    val publicKey = response.body.message.publicKey
                         .replace("-----BEGIN PUBLIC KEY-----", "")
                         .replace("-----END PUBLIC KEY-----", "")
                         .replace("\\s+".toRegex(), "")
@@ -62,16 +62,7 @@ class ServerPublicKeyStore @Inject constructor(
         }
     }
 
-    fun encryptPayload(payload: Any): String?{
-        return try {
-            val serializedPayload = gson.toJson(payload)
-            val cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding")
-            cipher.init(Cipher.ENCRYPT_MODE, getPublicKey())
-
-            val encryptedByte = cipher.doFinal(serializedPayload.toByteArray(Charsets.UTF_8))
-            Base64.encodeToString(encryptedByte, Base64.NO_WRAP)
-        } catch (exception: Exception){
-            null
-        }
+    fun encryptPayload(payload: Any): String? {
+        return cryptoManager.encrypt(payload, getPublicKey())
     }
 }

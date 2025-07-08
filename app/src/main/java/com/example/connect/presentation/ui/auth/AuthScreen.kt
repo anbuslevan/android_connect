@@ -25,6 +25,7 @@ import com.example.connect.presentation.ui.components.Input
 @Composable
 fun AuthScreen(viewModel: AuthViewModel = hiltViewModel()) {
     LaunchedEffect(Unit) {
+        viewModel.generateDeviceId()
         viewModel.getServerPublicKey()
     }
 

@@ -1,4 +1,4 @@
-package com.example.connect.model.response
+package com.example.connect.domain.model.response
 
 class ErrorResponse (
     val error: Array<String>?,
