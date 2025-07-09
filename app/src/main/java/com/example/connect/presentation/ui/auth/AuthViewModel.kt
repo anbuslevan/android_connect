@@ -71,6 +71,7 @@ class AuthViewModel @Inject constructor(
                         stateOfAuth = StateOfAuth.OTP,
                         error = null
                     )
+                    authUseCase.registerDevice()
                 } else if(response is NetworkResponse.Error){
                     state = state.copy(
                         isLoading = false,

@@ -53,7 +53,7 @@ class IdentityKeyStore @Inject constructor(){
         return Base64.encodeToString(publicKey.encoded, Base64.NO_WRAP)
     }
 
-    fun generateDeviceId(): String {
+    fun getDeviceId(): String {
         val keyStore = KeyStore.getInstance(androidKeyStore).apply { load(null) }
 
         if(keyStore.containsAlias(identityIdAlias)) {

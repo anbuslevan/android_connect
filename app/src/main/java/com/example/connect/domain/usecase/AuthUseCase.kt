@@ -2,6 +2,7 @@ package com.example.connect.domain.usecase
 
 import com.example.connect.data.crypto.CryptoManager
 import com.example.connect.data.crypto.IdentityKeyStore
+import com.example.connect.data.crypto.PreKeyStore
 import com.example.connect.data.crypto.PublicKeyStore
 import com.example.connect.data.crypto.ServerPublicKeyStore
 import com.example.connect.domain.model.request.AuthRequest
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class AuthUseCase @Inject constructor(
     private val cryptoManager: CryptoManager,
     private val repository: AuthRepository,
+    private val preKeyStore: PreKeyStore,
     private val publicKeyStore: PublicKeyStore,
     private val identityKeyStore: IdentityKeyStore,
     private val serverPublicKeyStore: ServerPublicKeyStore
@@ -23,7 +25,7 @@ class AuthUseCase @Inject constructor(
     suspend fun requestOTP(mobileNumber: String): NetworkResponse<AuthResponse, ErrorResponse> {
         val payload = serverPublicKeyStore.encryptPayload(
             MobileAuthRequest(mobileNumber = mobileNumber,
-                deviceToken = identityKeyStore.generateDeviceId()
+                deviceId = identityKeyStore.getDeviceId()
             )
         )
         return repository.requestOTP(AuthRequest(encryptedContext = payload ?: ""))
@@ -33,10 +35,19 @@ class AuthUseCase @Inject constructor(
         val payload = serverPublicKeyStore.encryptPayload(
             TwoFARequest(mobileNumber = mobileNumber,
                 otp = cryptoManager.hash(otp),
-                deviceToken = identityKeyStore.generateDeviceId()
+                deviceId = identityKeyStore.getDeviceId()
             )
         )
         return repository.verifyOTP(AuthRequest(encryptedContext = payload ?: ""))
+    }
+
+    suspend fun registerDevice() {
+        val deviceId = identityKeyStore.getDeviceId()
+        val identityKeyPair = identityKeyStore.ensureKeyPair()
+//
+//        val signedPreKeyId = preKeyStore.generateSignedPreKey(identityKeyPair.private)
+//        val oneTimePreKeys = preKeyStore.gener
+
     }
 
     suspend fun fetchServersPublicKey(){
@@ -44,6 +55,6 @@ class AuthUseCase @Inject constructor(
     }
 
     fun generateDeviceId(){
-        identityKeyStore.generateDeviceId()
+        identityKeyStore.getDeviceId()
     }
 }

@@ -1,7 +1,7 @@
 package com.example.connect.di
 
 import com.example.connect.data.crypto.IdentityKeyStore
-import com.example.connect.data.crypto.PreKeyManager
+import com.example.connect.data.crypto.PreKeyStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,5 +17,5 @@ class CryptoModule {
 
     @Provides
     @Singleton
-    fun providePreKeyManager(): PreKeyManager = PreKeyManager()
+    fun providePreKeyStore(): PreKeyStore = PreKeyStore()
 }
